@@ -1,0 +1,13 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: spccc-{{ .service.namespace }}-egress-service-entry
+  namespace: "{{ .service.namespace }}"
+spec:
+  hosts:
+  - "{{ .service.name }}.{{ .service.namespace }}.svc.{{ .remote.cluster.instanceID }}.remote"
+  ports:
+  - number: "{{ .cluster.tunnelPort }}"
+    name: http
+    protocol: HTTP
+  resolution: "{{ .resolution }}"

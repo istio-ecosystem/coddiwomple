@@ -1,0 +1,20 @@
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: spccc-{{ .service.name }}-egress-splitter-virtual-service
+  namespace: "{{ .service.namespace }}"
+spec:
+  gateways:
+  - mesh
+  hosts:
+  - "{{ .service.name }}.{{ .service.namespace }}.svc.cluster.local"            
+  http:
+    - appendHeaders: 
+        host: "{{ .service.name }}.{{ .service.namespace }}.svc.{{ .remote.cluster.instanceID }}.remote"
+      route:
+        - destination:
+          host: "{{ .service.name }}.{{ .service.namespace }}.svc.{{ .remote.cluster.instanceID }}.remote"
+          port:
+              number: "{{ .cluster.tunnelPort }}"
+          weight: 100
