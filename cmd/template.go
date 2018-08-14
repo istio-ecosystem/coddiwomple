@@ -11,18 +11,17 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func init() {
-	rootCmd.AddCommand(templateCmd)
-}
-
-var templateCmd = &cobra.Command{
-	Use:   "template",
-	Short: "mcc template creates manifests",
-	Long: `mcc template creates templates for Istio
+func templateCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "template",
+		Short: "mcc template creates manifests",
+		Long: `mcc template creates templates for Istio
 	https://github.com/tetratelabs/mcc   `,
-	Run: func(cmd *cobra.Command, args []string) {
-		generate(args...)
-	},
+		Run: func(cmd *cobra.Command, args []string) {
+			generate(args...)
+		},
+	}
+
 }
 
 type Parameters map[string]interface{}
