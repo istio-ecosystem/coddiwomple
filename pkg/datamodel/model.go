@@ -62,6 +62,17 @@ type GlobalService struct {
 	Unregistered bool `json:"unregistered,omitempty"`
 }
 
+// Cluster represents a cluster that can host services.
+type Cluster struct {
+	// Name of this cluster
+	Name string `json:"name"`
+	// Address is the DNS address of this cluster
+	Address string `json:"address"`
+}
+
+// Clusters is a list of Cluster
+type Clusters []Cluster
+
 // Infrastructure abstracts the system that has information about
 // the actual location of the gateways, their addresses, handles to
 // the underlying clusters connected to this manager, etc.

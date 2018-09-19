@@ -1,5 +1,11 @@
 [
     {
+        "name": "default",
+        "address": "default.foo.com",
+        "kubeconfig_path": "",
+        "kubeconfig_context": ""
+    },
+    {
         "name": "a",
         "address": "a.com"
     },

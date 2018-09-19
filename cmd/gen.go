@@ -1,19 +1,13 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
-	"sort"
-	"strings"
 
-	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	"github.com/tetratelabs/mcc/pkg/datamodel"
-	"github.com/tetratelabs/mcc/pkg/datamodel/mem"
 	"github.com/tetratelabs/mcc/pkg/routing"
 )
 
@@ -37,7 +31,7 @@ func configGenCmd() *cobra.Command {
 			var infra datamodel.Infrastructure
 			var clusters []string
 			//if clustersFile != "" {
-			clusters, infra, err = clustersFromFile(clustersFile)
+			clusters, _, infra, err = clustersFromFile(clustersFile)
 			//} else {
 			//	clusters, infra, err = clustersFlagToInfra(clusters)
 			//}
@@ -97,72 +91,8 @@ func configGenCmd() *cobra.Command {
 	//	"comma separated list of name:address pairs where the address is a DNS name. // TODO support IPs")
 	cmd.PersistentFlags().StringVar(&clustersFile, "cluster-file", "./clusters.json",
 		`Path to a file with a JSON array of clusters, where a cluster is an object like '{"name": "ClusterName", "address": "dns.address.of.cluster"}'`)
-
 	cmd.PersistentFlags().StringVar(&servicesFile, "service-file", "./services.json",
 		`Path to a file with a JSON array of GlobalServices, see datamodel.GlobalService for the JSON schema.`)
 
 	return cmd
-}
-
-type services []datamodel.GlobalService
-
-func serviceFromFile(path string) (datamodel.DataModel, error) {
-	contents, err := ioutil.ReadFile(path)
-	if err != nil {
-		return nil, errors.Wrapf(err, "could not open file %q", path)
-	}
-	gss := services{}
-	if err := json.Unmarshal(contents, &gss); err != nil {
-		return nil, errors.Wrap(err, "could not unmarshal file as json")
-	}
-
-	dm := mem.DataModel()
-	for _, gs := range gss {
-		svc := gs
-		dm.CreateGlobalService(&svc)
-	}
-	return dm, nil
-}
-
-type clusters []cluster
-type cluster struct {
-	Name    string `json:"name"`
-	Address string `json:"address"`
-}
-
-func clustersFromFile(path string) ([]string, datamodel.Infrastructure, error) {
-	contents, err := ioutil.ReadFile(path)
-	if err != nil {
-		return []string{}, nil, errors.Wrapf(err, "could not open file %q", path)
-	}
-	c := clusters{}
-	if err := json.Unmarshal(contents, &c); err != nil {
-		return []string{}, nil, errors.Wrap(err, "could not unmarshal file as json")
-	}
-
-	names := make([]string, len(c))
-	cls := make(map[string]string, len(c))
-	for i, cl := range c {
-		names[i] = cl.Name
-		cls[cl.Name] = cl.Address
-	}
-	sort.Strings(names)
-	return names, mem.Infrastructure(cls), nil
-}
-
-func clustersFlagToInfra(clusters []string) ([]string, datamodel.Infrastructure, error) {
-	cls := make(map[string]string, len(clusters))
-	names := make([]string, 0, len(clusters))
-	var errs error
-	for i, c := range clusters {
-		parts := strings.Split(c, ":")
-		if len(parts) != 2 {
-			errs = multierror.Append(errs, fmt.Errorf("expected `name:address` pairs but got %q", c))
-			continue
-		}
-		cls[parts[0]] = parts[1]
-		names[i] = parts[0]
-	}
-	sort.Strings(names)
-	return names, mem.Infrastructure(cls), errs
 }
