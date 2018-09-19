@@ -1,0 +1,57 @@
+[
+    {
+        "name": "foo",
+        "dns_prefixes": [
+            "foo",
+            "foo.default"
+        ],
+        "ports": [
+            {
+                "name": "http",
+                "service_port": 80,
+                "protocol": "HTTP",
+                "backend_port": 80
+            }
+        ],
+        "backends": {
+            "a": "foo.default.svc.cluster.local"
+        }
+    },
+    {
+        "name": "bar",
+        "dns_prefixes": [
+            "bar",
+            "bar.default"
+        ],
+        "ports": [
+            {
+                "name": "http",
+                "service_port": 80,
+                "protocol": "HTTP",
+                "backend_port": 80
+            }
+        ],
+        "backends": {
+            "b": "bar.default.svc.cluster.local"
+        }
+    },
+    {
+        "name": "car",
+        "dns_prefixes": [
+            "car",
+            "car.default"
+        ],
+        "ports": [
+            {
+                "name": "tcp",
+                "service_port": 81,
+                "protocol": "TCP",
+                "backend_port": 81
+            }
+        ],
+        "backends": {
+            "c": "car.default.svc.cluster.local"
+        },
+        "address": "1.2.3.4"
+    }
+]

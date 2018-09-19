@@ -15,4 +15,4 @@ mcc:
 	@chmod +x mcc
 
 clean:
-	@rm mcc
+	@rm mcc || true

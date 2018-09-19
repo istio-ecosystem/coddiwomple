@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/pkg/errors"
 	"github.com/tetratelabs/mcc/pkg/datamodel"
 
 	"github.com/ghodss/yaml"
 	multierror "github.com/hashicorp/go-multierror"
 	istioapi "istio.io/api/networking/v1alpha3"
-	istioconfig "istio.io/istio/pilot/pkg/model"
 	istiocrd "istio.io/istio/pilot/pkg/config/kube/crd"
+	istioconfig "istio.io/istio/pilot/pkg/model"
 )
 
 // IstioConfigDescriptor describes an Istio networking configuration object
@@ -29,11 +30,31 @@ type IstioConfigDescriptor struct {
 	Cluster string
 }
 
+// GenerateConfigs generates configuration for every cluster, service pair in the DataModel.
+// It returns a map of (service name -> (cluster name -> configs))
+func GenerateConfigs(dm datamodel.DataModel, infra datamodel.Infrastructure, clusters []string) ([]string, map[string]map[string][]*IstioConfigDescriptor, error) {
+	var errs error
+	svcs := dm.ListGlobalServices()
+	names := make([]string, 0, len(svcs))
+	out := make(map[string]map[string][]*IstioConfigDescriptor, len(svcs))
+	for name, svc := range svcs {
+		cfgs, err := BuildGlobalServiceConfigs(svc, clusters, infra)
+		if err != nil {
+			errs = multierror.Append(errs, errors.Wrap(err, "could not construct configs"))
+			continue
+		}
+		names = append(names, name)
+		out[name] = cfgs
+	}
+	sort.Strings(names)
+	return names, out, errs
+}
+
 // DefaultDomainSuffix is the shared DNS suffix for all such global services.
 // TODO: make this configurable
 const DefaultDomainSuffix = "global"
 
-func buildGlobalService(globalService *datamodel.GlobalService, clusters []string, infrastructure *datamodel.Infrastructure) (map[string][]*IstioConfigDescriptor, error) {
+func BuildGlobalServiceConfigs(globalService *datamodel.GlobalService, clusters []string, infrastructure datamodel.Infrastructure) (map[string][]*IstioConfigDescriptor, error) {
 	// In an attempt to handle updates, we try to remove the service
 	// generate ingress gateway per cluster
 	gateways, err := buildIstioGatewayForGlobalService(globalService)
@@ -99,7 +120,7 @@ func buildIstioGatewayForGlobalService(globalService *datamodel.GlobalService) (
 	// 1. generate ingress gateway
 	gateway := &istioapi.Gateway{
 		Servers:  make([]*istioapi.Server, 0), // We need a server for each port in global service
-		Selector: map[string]string{"mcc": "ingressgateway"},
+		Selector: map[string]string{"istio": "ingressgateway"},
 	}
 
 	hosts := make([]string, 0)
@@ -226,10 +247,14 @@ func buildServiceEntryForGlobalService(globalService *datamodel.GlobalService, i
 
 	serviceEntry := &istioapi.ServiceEntry{
 		Hosts:      hosts,
-		Addresses:  []string{globalService.Address.String()},
 		Location:   istioapi.ServiceEntry_MESH_EXTERNAL,
 		Resolution: istioapi.ServiceEntry_DNS,
 	}
+
+	if len(globalService.Address) > 0 {
+		serviceEntry.Addresses = []string{globalService.Address.String()}
+	}
+
 	endpointPortMap := make(map[string]uint32)
 
 	for _, p := range globalService.Ports {
