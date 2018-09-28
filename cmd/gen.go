@@ -38,7 +38,7 @@ func configGenCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "gen",
 		Short:   "Generates Istio config for each cluster for the target service.",
-		Example: "mcc gen ",
+		Example: "cw gen ",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var err error
 
@@ -97,10 +97,10 @@ func configGenCmd() *cobra.Command {
 
 	cmd.PersistentFlags().StringVar(&cluster, "cluster", "",
 		"Print configuration only for the provided cluster; must match a cluster name in the cluster-file. "+
-			"E.g. `kubectl apply -f <(mcc gen --cluster cluster-name) --context cluster-name`")
+			"E.g. `kubectl apply -f <(cw gen --cluster cluster-name) --context cluster-name`")
 	cmd.PersistentFlags().StringVar(&service, "service", "",
 		"Print configuration only for the provided service; must match a service name in the service-file. "+
-			"E.g. `kubectl apply -f <(mcc gen --service foo --cluster cluster-name) --context cluster-name`")
+			"E.g. `kubectl apply -f <(cw gen --service foo --cluster cluster-name) --context cluster-name`")
 	//cmd.PersistentFlags().StringSliceVarP(&clusters, "clusters", "c", []string{},
 	//	"comma separated list of name:address pairs where the address is a DNS name. // TODO support IPs")
 	cmd.PersistentFlags().StringVar(&clustersFile, "cluster-file", "./clusters.json",

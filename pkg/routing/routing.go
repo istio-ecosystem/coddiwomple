@@ -141,7 +141,7 @@ func buildIstioGatewayForGlobalService(globalService *datamodel.GlobalService) (
 	for _, dnsPrefix := range globalService.DNSPrefixes {
 		hosts = append(hosts, fmt.Sprintf("%s.%s", dnsPrefix, DefaultDomainSuffix))
 	}
-	gatewayName := fmt.Sprintf("mcc-%s-gateway", globalService.Name)
+	gatewayName := fmt.Sprintf("cw-%s-gateway", globalService.Name)
 
 	for _, p := range globalService.Ports {
 		server := &istioapi.Server{
@@ -162,7 +162,7 @@ func buildIstioGatewayForGlobalService(globalService *datamodel.GlobalService) (
 			Group:     istioconfig.Gateway.Group,
 			Version:   istioconfig.Gateway.Version,
 			Name:      gatewayName,
-			Namespace: "mcc",
+			Namespace: "cw",
 			Domain:    "svc.cluster.local",
 		},
 		Spec: gateway,
@@ -226,8 +226,8 @@ func buildVirtualServiceForGlobalService(globalService *datamodel.GlobalService,
 				Type:      istioconfig.VirtualService.Type,
 				Group:     istioconfig.VirtualService.Group,
 				Version:   istioconfig.VirtualService.Version,
-				Name:      fmt.Sprintf("mcc-%s-virtualservice", globalService.Name),
-				Namespace: "mcc",
+				Name:      fmt.Sprintf("cw-%s-virtualservice", globalService.Name),
+				Namespace: "cw",
 				Domain:    "svc.cluster.local", // TODO: We need to know this from the local cluster
 			},
 			Spec: virtualService,
@@ -312,8 +312,8 @@ func buildServiceEntryForGlobalService(globalService *datamodel.GlobalService, i
 			Type:      istioconfig.ServiceEntry.Type,
 			Group:     istioconfig.ServiceEntry.Group,
 			Version:   istioconfig.ServiceEntry.Version,
-			Name:      fmt.Sprintf("mcc-%s-serviceentry", globalService.Name),
-			Namespace: "mcc",
+			Name:      fmt.Sprintf("cw-%s-serviceentry", globalService.Name),
+			Namespace: "cw",
 			Domain:    "svc.cluster.local", // TODO: We need to know this from the local cluster
 		},
 		Spec: serviceEntry,
@@ -336,7 +336,7 @@ func buildServiceEntryForGlobalService(globalService *datamodel.GlobalService, i
 }
 
 func removeIstioGatewayForGlobalService(globalService *datamodel.GlobalService) (map[string]*IstioConfigDescriptor, error) {
-	gatewayName := fmt.Sprintf("mcc-%s-gateway", globalService.Name)
+	gatewayName := fmt.Sprintf("cw-%s-gateway", globalService.Name)
 
 	crd := &istioconfig.Config{
 		ConfigMeta: istioconfig.ConfigMeta{
@@ -344,7 +344,7 @@ func removeIstioGatewayForGlobalService(globalService *datamodel.GlobalService) 
 			Group:     istioconfig.Gateway.Group,
 			Version:   istioconfig.Gateway.Version,
 			Name:      gatewayName,
-			Namespace: "mcc",
+			Namespace: "cw",
 			Domain:    "svc.cluster.local",
 		},
 		Spec: &istioapi.Gateway{},
@@ -379,8 +379,8 @@ func removeVirtualServiceForGlobalService(globalService *datamodel.GlobalService
 				Type:      istioconfig.VirtualService.Type,
 				Group:     istioconfig.VirtualService.Group,
 				Version:   istioconfig.VirtualService.Version,
-				Name:      fmt.Sprintf("mcc-%s-virtualservice", globalService.Name),
-				Namespace: "mcc",
+				Name:      fmt.Sprintf("cw-%s-virtualservice", globalService.Name),
+				Namespace: "cw",
 				Domain:    "svc.cluster.local", // TODO: We need to know this from the local cluster
 			},
 			Spec: &istioapi.VirtualService{},
@@ -410,8 +410,8 @@ func removeServiceEntryForGlobalService(globalService *datamodel.GlobalService) 
 			Type:      istioconfig.ServiceEntry.Type,
 			Group:     istioconfig.ServiceEntry.Group,
 			Version:   istioconfig.ServiceEntry.Version,
-			Name:      fmt.Sprintf("mcc-%s-serviceentry", globalService.Name),
-			Namespace: "mcc",
+			Name:      fmt.Sprintf("cw-%s-serviceentry", globalService.Name),
+			Namespace: "cw",
 			Domain:    "svc.cluster.local", // TODO: We need to know this from the local cluster
 		},
 		Spec: &istioapi.ServiceEntry{},

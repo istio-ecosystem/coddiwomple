@@ -64,8 +64,8 @@ func uiCmd() (serve *cobra.Command) {
 
 	serve = &cobra.Command{
 		Use:     "ui",
-		Short:   "Starts the mcc UI on localhost",
-		Example: "mcc ui --port 123",
+		Short:   "Starts the Coddiwomple UI on localhost",
+		Example: "cw ui --port 123",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clusterNames, clusters, infra, err := clustersFromFile(clustersFile)
 			if err != nil {

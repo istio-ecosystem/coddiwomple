@@ -22,11 +22,11 @@ import (
 
 func Root() *cobra.Command {
 	rootCmd := &cobra.Command{
-		Use:   "mcc",
-		Short: "mcc creates mantifests",
-		Long:  `Multicloud cross-cluster configuration for Istio`,
+		Use:   "cw",
+		Short: "Coddiwomple creates mantifests",
+		Long:  `Coddiwomple, a multi-cloud cross-cluster configuration generator for Istio`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return errors.New("cannot use mcc directly, use a subcommand")
+			return errors.New("cannot use cw directly, use a subcommand")
 		},
 	}
 

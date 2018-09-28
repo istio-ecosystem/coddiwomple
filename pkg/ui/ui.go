@@ -85,7 +85,7 @@ var tmpl = template.Must(template.New("").Funcs(template.FuncMap{
 	},
 }).Parse(`{{ $clusterNames := .ClusterNames }}<html lang="en">
 	<head>
-		<title>MCC UI</title>
+		<title>Coddiwomple UI</title>
 		<meta name="description" content="Your services listed by cluster">
 		<script>
 			window.onload = function() {
