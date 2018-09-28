@@ -87,14 +87,20 @@ func BuildGlobalServiceConfigs(globalService *datamodel.GlobalService, clusters 
 		return nil, err
 	}
 
+	backendClusters := make(map[string]bool, len(globalService.Backends))
 	configsToApply := make(map[string][]*IstioConfigDescriptor)
 	// Since we return error above, at this stage, gateways and virtualservices will have same set of clusters
 	for cluster := range globalService.Backends {
 		configsToApply[cluster] = []*IstioConfigDescriptor{gateways[cluster], virtualServices[cluster]}
+		backendClusters[cluster] = true;
 	}
 
 	for _, c := range clusters {
-		configsToApply[c] = append(configsToApply[c], serviceEntry)
+		if !backendClusters[c] {
+			configsToApply[c] = append(configsToApply[c], serviceEntry)
+		} else if se, err := buildServiceEntryForLocalService(globalService, c); err == nil {
+			configsToApply[c] = append(configsToApply[c], se)
+		}
 	}
 
 	return configsToApply, nil
@@ -197,15 +203,16 @@ func buildVirtualServiceForGlobalService(globalService *datamodel.GlobalService,
 	for cluster, backendHost := range globalService.Backends {
 		virtualService := &istioapi.VirtualService{
 			Hosts:    gateways[cluster].Hosts,
-			Gateways: []string{gateways[cluster].Name},
+			Gateways: []string{"mesh", gateways[cluster].Name},
 			Http:     []*istioapi.HTTPRoute{},
 			// TODO: TLS/TCP
 		}
 		// Generate a HTTP route for all http ports
+		portMap := make(map[uint32]*istioapi.HTTPRoute)
 		for _, p := range globalService.Ports {
 			// TODO: Support other protocols once all pieces are in place
 			if istioconfig.ParseProtocol(p.Protocol).IsHTTP() {
-				httpRoute := &istioapi.HTTPRoute{
+				portMap[p.ServicePort] = &istioapi.HTTPRoute{
 					Match: []*istioapi.HTTPMatchRequest{{Port: p.ServicePort}},
 					Route: []*istioapi.DestinationWeight{
 						{
@@ -217,8 +224,23 @@ func buildVirtualServiceForGlobalService(globalService *datamodel.GlobalService,
 						},
 					},
 				}
-				virtualService.Http = append(virtualService.Http, httpRoute)
+				portMap[p.BackendPort] = &istioapi.HTTPRoute{
+					Match: []*istioapi.HTTPMatchRequest{{Port: p.BackendPort}},
+					Route: []*istioapi.DestinationWeight{
+						{
+							Destination: &istioapi.Destination{
+								Host: backendHost,
+								Port: &istioapi.PortSelector{Port: &istioapi.PortSelector_Number{Number: p.BackendPort}},
+							},
+							Weight: 100,
+						},
+					},
+				}
 			}
+		}
+
+		for _, httpRoute := range portMap {
+			virtualService.Http = append(virtualService.Http, httpRoute)
 		}
 
 		virtualServiceCRD := &istioconfig.Config{
@@ -226,7 +248,7 @@ func buildVirtualServiceForGlobalService(globalService *datamodel.GlobalService,
 				Type:      istioconfig.VirtualService.Type,
 				Group:     istioconfig.VirtualService.Group,
 				Version:   istioconfig.VirtualService.Version,
-				Name:      fmt.Sprintf("cw-%s-virtualservice", globalService.Name),
+				Name:      fmt.Sprintf("cw-%s-virtualservice-remote", globalService.Name),
 				Namespace: "cw",
 				Domain:    "svc.cluster.local", // TODO: We need to know this from the local cluster
 			},
@@ -273,7 +295,7 @@ func buildServiceEntryForGlobalService(globalService *datamodel.GlobalService, i
 
 	for _, p := range globalService.Ports {
 		serviceEntry.Ports = append(serviceEntry.Ports, &istioapi.Port{
-			Number:   p.ServicePort,
+			Number:   p.BackendPort,
 			Protocol: p.Protocol,
 			Name:     p.Name,
 		})
@@ -301,6 +323,74 @@ func buildServiceEntryForGlobalService(globalService *datamodel.GlobalService, i
 			Labels:  map[string]string{"cluster": cluster},
 		})
 	}
+
+	// Return error if there are no endpoints for the service entry
+	if len(serviceEntry.Endpoints) == 0 {
+		return nil, errs
+	}
+
+	serviceEntryCRD := &istioconfig.Config{
+		ConfigMeta: istioconfig.ConfigMeta{
+			Type:      istioconfig.ServiceEntry.Type,
+			Group:     istioconfig.ServiceEntry.Group,
+			Version:   istioconfig.ServiceEntry.Version,
+			Name:      fmt.Sprintf("cw-%s-serviceentry", globalService.Name),
+			Namespace: "cw",
+			Domain:    "svc.cluster.local", // TODO: We need to know this from the local cluster
+		},
+		Spec: serviceEntry,
+	}
+
+	serviceEntryYAML, err := protoConfigToYAML(istioconfig.ServiceEntry, serviceEntryCRD)
+	if err != nil {
+		errs = multierror.Append(errs, err)
+		// Skip the entire service entry
+		return nil, errs
+	}
+
+	return &IstioConfigDescriptor{
+		Name:    serviceEntryCRD.Name,
+		Hosts:   hosts,
+		Config:  serviceEntryCRD,
+		Yaml:    serviceEntryYAML,
+		Cluster: "",
+	}, errs
+}
+
+func buildServiceEntryForLocalService(globalService *datamodel.GlobalService, localCluster string) (*IstioConfigDescriptor, error) {
+	var errs error
+	hosts := make([]string, 0)
+	for _, dnsPrefix := range globalService.DNSPrefixes {
+		hosts = append(hosts, fmt.Sprintf("%s.%s", dnsPrefix, DefaultDomainSuffix))
+	}
+
+	serviceEntry := &istioapi.ServiceEntry{
+		Hosts:      hosts,
+		Location:   istioapi.ServiceEntry_MESH_INTERNAL,
+		Resolution: istioapi.ServiceEntry_DNS,
+	}
+
+	if len(globalService.Address) > 0 {
+		serviceEntry.Addresses = []string{globalService.Address.String()}
+	}
+
+	endpointPortMap := make(map[string]uint32)
+
+	for _, p := range globalService.Ports {
+		serviceEntry.Ports = append(serviceEntry.Ports, &istioapi.Port{
+			Number:   p.BackendPort,
+			Protocol: p.Protocol,
+			Name:     p.Name,
+		})
+		endpointPortMap[p.Name] = p.BackendPort
+	}
+
+		serviceEntry.Endpoints = append(serviceEntry.Endpoints, &istioapi.ServiceEntry_Endpoint{
+			Address: globalService.Backends[localCluster],
+			Ports:   endpointPortMap,
+			Labels:  map[string]string{"cluster": localCluster},
+		})
+
 
 	// Return error if there are no endpoints for the service entry
 	if len(serviceEntry.Endpoints) == 0 {
