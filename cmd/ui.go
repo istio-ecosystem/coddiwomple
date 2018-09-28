@@ -56,8 +56,7 @@ var (
 
 func uiCmd() (serve *cobra.Command) {
 	var (
-		port        int
-		kubeConfigs []string
+		port int
 		//clusters    []string
 		clustersFile string
 	)
@@ -96,11 +95,6 @@ func uiCmd() (serve *cobra.Command) {
 	}
 
 	serve.PersistentFlags().IntVar(&port, "port", 8080, "the port to start the local UI server on")
-	serve.PersistentFlags().StringArrayVar(&kubeConfigs, "kube-config", nil,
-		"kubeconfig location in the form 'name:filepath:contextNameOne,contextNameTwo' where contextNameOne is the name passed to "+
-			"`kubectl --context=contextNameOne`. If no contexts are provided the tool will use the default context. "+
-			"This flag can be repeated to set multiple kubeconfigs with multiple contexts each. "+
-			"The name should match the name for the cluster in the cluster-file.")
 	//serve.PersistentFlags().StringArrayVar(&clusters, "cluster", []string{}, "The clusters that we'll generate configs for, "+
 	//	"in the format name,port,endpoint1,endpoint2,..., e.g. --remote-cluster=remote,80,10.11.12.13. "+
 	//	"This flag can be provided multiple times for multiple remote clusters. "+
@@ -108,7 +102,7 @@ func uiCmd() (serve *cobra.Command) {
 	//	"The names for these clusters must match the names of the contexts in each .")
 
 	serve.PersistentFlags().StringVar(&clustersFile, "cluster-file", "",
-		`Path to a file with a JSON array of clusters, where a cluster is an object like '{"name": "ClusterName", "address": "dns.address.of.cluster"}'`)
+		`Path to a file with a JSON array of clusters, where a cluster is an object like '{"name": "ClusterName", "address": "dns.address.of.cluster", "kubeconfig_path": "/path/to/kubeconfig/for/cluster", "kubeconfig_context": "context_name"}'`)
 
 	return serve
 }
