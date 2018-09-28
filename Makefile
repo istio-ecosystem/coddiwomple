@@ -9,10 +9,10 @@ $(DEP):
 	@go get github.com/golang/dep/cmd/dep
 
 
-build: mcc
-mcc:
-	go build -o mcc ./cmd/mcc
-	@chmod +x mcc
+build: cw
+cw:
+	go build -o cw ./cmd/cw
+	@chmod +x cw
 
 clean:
-	@rm mcc || true
+	@rm cw || true

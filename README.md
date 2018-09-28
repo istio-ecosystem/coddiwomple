@@ -1,11 +1,12 @@
-# mcc
-Multi Cluster Config Generation
+# cw
+Coddiwomple, a Multi-Cluster-Config Generator
 
 To install:
 ```bash
 go get github.com/tetratelabs/mcc/cmd/mcc
 
-mcc --service-file ./services.json --cluster-file ./clusters.json 
+```bash
+cw gen --cluster-file ./clusters.json --service-file ./services.json
 ```
 
 Where `clusters.json` must is a JSON array of clusters, where each cluster is `{"name": string, "address": string}`; the address must be a DNS name.

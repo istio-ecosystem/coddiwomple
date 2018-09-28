@@ -1,3 +1,17 @@
+// Copyright 2018 Tetrate, Inc. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package cmd
 
 import (
@@ -42,16 +56,15 @@ var (
 
 func uiCmd() (serve *cobra.Command) {
 	var (
-		port        int
-		kubeConfigs []string
+		port int
 		//clusters    []string
 		clustersFile string
 	)
 
 	serve = &cobra.Command{
 		Use:     "ui",
-		Short:   "Starts the mcc UI on localhost",
-		Example: "mcc ui --port 123",
+		Short:   "Starts the Coddiwomple UI on localhost",
+		Example: "cw ui --port 123",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clusterNames, clusters, infra, err := clustersFromFile(clustersFile)
 			if err != nil {
@@ -82,11 +95,6 @@ func uiCmd() (serve *cobra.Command) {
 	}
 
 	serve.PersistentFlags().IntVar(&port, "port", 8080, "the port to start the local UI server on")
-	serve.PersistentFlags().StringArrayVar(&kubeConfigs, "kube-config", nil,
-		"kubeconfig location in the form 'name:filepath:contextNameOne,contextNameTwo' where contextNameOne is the name passed to "+
-			"`kubectl --context=contextNameOne`. If no contexts are provided the tool will use the default context. "+
-			"This flag can be repeated to set multiple kubeconfigs with multiple contexts each. "+
-			"The name should match the name for the cluster in the cluster-file.")
 	//serve.PersistentFlags().StringArrayVar(&clusters, "cluster", []string{}, "The clusters that we'll generate configs for, "+
 	//	"in the format name,port,endpoint1,endpoint2,..., e.g. --remote-cluster=remote,80,10.11.12.13. "+
 	//	"This flag can be provided multiple times for multiple remote clusters. "+
@@ -94,7 +102,7 @@ func uiCmd() (serve *cobra.Command) {
 	//	"The names for these clusters must match the names of the contexts in each .")
 
 	serve.PersistentFlags().StringVar(&clustersFile, "cluster-file", "",
-		`Path to a file with a JSON array of clusters, where a cluster is an object like '{"name": "ClusterName", "address": "dns.address.of.cluster"}'`)
+		`Path to a file with a JSON array of clusters, where a cluster is an object like '{"name": "ClusterName", "address": "dns.address.of.cluster", "kubeconfig_path": "/path/to/kubeconfig/for/cluster", "kubeconfig_context": "context_name"}'`)
 
 	return serve
 }

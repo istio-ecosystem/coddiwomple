@@ -12,28 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cmd
+package main
 
 import (
-	"errors"
+	"fmt"
+	"os"
 
-	"github.com/spf13/cobra"
+	"github.com/tetratelabs/mcc/cmd"
 )
 
-func Root() *cobra.Command {
-	rootCmd := &cobra.Command{
-		Use:   "cw",
-		Short: "Coddiwomple creates mantifests",
-		Long:  `Coddiwomple, a multi-cloud cross-cluster configuration generator for Istio`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return errors.New("cannot use cw directly, use a subcommand")
-		},
+func main() {
+	rootCmd := cmd.Root()
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
-
-	rootCmd.AddCommand(
-		uiCmd(),
-		configGenCmd(),
-	)
-
-	return rootCmd
 }
