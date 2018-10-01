@@ -23,8 +23,8 @@ import (
 
 	multierror "github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
-	"github.com/tetratelabs/mcc/pkg/datamodel"
-	"github.com/tetratelabs/mcc/pkg/datamodel/mem"
+	"github.com/istio-ecosystem/coddiwomple/pkg/datamodel"
+	"github.com/istio-ecosystem/coddiwomple/pkg/datamodel/mem"
 )
 
 type services []datamodel.GlobalService

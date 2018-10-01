@@ -36,8 +36,8 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	"k8s.io/client-go/tools/clientcmd"
 
-	"github.com/tetratelabs/mcc/pkg/datamodel/mem"
-	"github.com/tetratelabs/mcc/pkg/ui"
+	"github.com/istio-ecosystem/coddiwomple/pkg/datamodel/mem"
+	"github.com/istio-ecosystem/coddiwomple/pkg/ui"
 )
 
 const (

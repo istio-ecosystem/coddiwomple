@@ -25,7 +25,7 @@ import (
 	"istio.io/istio/pilot/pkg/serviceregistry/kube"
 	"k8s.io/api/core/v1"
 
-	"github.com/tetratelabs/mcc/pkg/datamodel"
+	"github.com/istio-ecosystem/coddiwomple/pkg/datamodel"
 )
 
 type (

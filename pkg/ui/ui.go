@@ -26,9 +26,9 @@ import (
 
 	"log"
 
-	"github.com/tetratelabs/mcc/pkg/datamodel"
-	"github.com/tetratelabs/mcc/pkg/datamodel/mem"
-	"github.com/tetratelabs/mcc/pkg/routing"
+	"github.com/istio-ecosystem/coddiwomple/pkg/datamodel"
+	"github.com/istio-ecosystem/coddiwomple/pkg/datamodel/mem"
+	"github.com/istio-ecosystem/coddiwomple/pkg/routing"
 )
 
 func RegisterHandlers(dm datamodel.DataModel, infra datamodel.Infrastructure, clusterNames []string, mux *http.ServeMux) {

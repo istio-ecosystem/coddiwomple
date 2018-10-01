@@ -20,7 +20,7 @@ import (
 	"sort"
 
 	"github.com/pkg/errors"
-	"github.com/tetratelabs/mcc/pkg/datamodel"
+	"github.com/istio-ecosystem/coddiwomple/pkg/datamodel"
 
 	"github.com/ghodss/yaml"
 	multierror "github.com/hashicorp/go-multierror"

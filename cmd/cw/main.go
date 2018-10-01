@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/tetratelabs/mcc/cmd"
+	"github.com/istio-ecosystem/coddiwomple/cmd"
 )
 
 func main() {

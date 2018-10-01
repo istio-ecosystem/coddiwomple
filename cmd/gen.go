@@ -21,8 +21,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/tetratelabs/mcc/pkg/datamodel"
-	"github.com/tetratelabs/mcc/pkg/routing"
+	"github.com/istio-ecosystem/coddiwomple/pkg/datamodel"
+	"github.com/istio-ecosystem/coddiwomple/pkg/routing"
 )
 
 func configGenCmd() *cobra.Command {
