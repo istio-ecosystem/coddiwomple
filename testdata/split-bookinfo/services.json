@@ -1,0 +1,75 @@
+[
+    {
+        "name": "details",
+        "dns_prefixes": [
+            "details",
+            "details.default"
+        ],
+        "ports": [
+            {
+                "name": "http",
+                "service_port": 9080,
+                "protocol": "HTTP",
+                "backend_port": 9080
+            }
+        ],
+        "backends": {
+            "a": "details.default.svc.cluster.local",
+            "b": "details.default.svc.cluster.local"
+        }
+    },
+    {
+        "name": "ratings",
+        "dns_prefixes": [
+            "ratings",
+            "ratings.default"
+        ],
+        "ports": [
+            {
+                "name": "http",
+                "service_port": 9080,
+                "protocol": "HTTP",
+                "backend_port": 9080
+            }
+        ],
+        "backends": {
+            "a": "ratings.default.svc.cluster.local"
+        }
+    },
+    {
+        "name": "productpage",
+        "dns_prefixes": [
+            "productpage",
+            "productpage.default"
+        ],
+        "ports": [
+            {
+                "name": "http",
+                "service_port": 9080,
+                "protocol": "HTTP",
+                "backend_port": 9080
+            }
+        ],
+        "backends": {
+            "a": "productpage.default.svc.cluster.local"
+        }
+    },
+    {
+        "name": "reviews",
+        "dns_prefixes": [
+            "reviews",
+            "reviews.default"
+        ],
+        "ports": [
+            {
+                "name": "http",
+                "service_port": 9080,
+                "protocol": "HTTP",
+                "backend_port": 9080
+            }
+        ],
+        "backends": {
+            "b": "reviews.default.svc.cluster.local"
+        }
+    }
+]

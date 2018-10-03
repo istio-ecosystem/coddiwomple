@@ -9,7 +9,7 @@ $ dep ensure
 $ make
 ```
 
-## Quick Start
+## Quick Start - UI Mode
 The easiest way to start using `cw` is through the built-in UI.
 
 ```bash
@@ -137,3 +137,22 @@ For exmaple:
     }
 ]
 ```
+
+## Example - Split Bookinfo
+The `testdata/split-bookinfo` directory contains the Kubernetes YAMLs for Bookinfo, split in two to distribute the services across two clusters, A, and B thus:
+
+* Cluster A
+  * `productpage` and ingress `Gateway`, `VirtualService`
+  * `ratings`
+  * `details`
+* Cluster B
+  * `reviews`
+  * `details`
+
+Ergo there is a call-chain from `productpage` (cluster A) -> `reviews` (cluster B) -> `ratings` (cluster A).
+
+The directory also contains an example `services.json` detailing Bookinfo; only the cluster names need be changed.
+
+Note: In order for Bookinfo to use Coddiwomple's Istio configuration to call across meshes, the Bookinfo code needs to be modified to use names of the form `details.global`.
+Thus, these YAMLs deploy custom Bookinfo images with this change made.
+The source for this modified Bookinfo hasn't been published yet, but is trivial to recreate.
