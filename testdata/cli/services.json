@@ -14,7 +14,8 @@
             }
         ],
         "backends": {
-            "a": "foo.default.svc.cluster.local"
+            "a": "foo.default.svc.cluster.local",
+            "b": "foo.default.svc.cluster.local"
         }
     },
     {
@@ -32,7 +33,8 @@
             }
         ],
         "backends": {
-            "b": "bar.default.svc.cluster.local"
+            "b": "bar.default.svc.cluster.local",
+            "c": "bar.default.svc.cluster.local"
         }
     },
     {
