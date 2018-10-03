@@ -1,51 +1,77 @@
 # cw
 Coddiwomple, a Multi-Cluster-Config Generator
 
-To install:
+## Installation
 ```bash
-go get github.com/tetratelabs/mcc/cmd/mcc
-
-```bash
-cw gen --cluster-file ./clusters.json --service-file ./services.json
+$ go get -u github.com/istio-ecosystem/cw
+$ cd $GOPATH/github.com/istio-ecosystem/cw
+$ dep ensure
+$ make
 ```
 
-Where `clusters.json` must is a JSON array of clusters, where each cluster is `{"name": string, "address": string}`; the address must be a DNS name.
+## Quick Start
+The easiest way to start using `cw` is through the built-in UI.
+
+```bash
+cw ui --cluster-file ./clusters.json 
+```
+
+Where `clusters.json` must is a JSON array of clusters, where each cluster is `{"name": string, "address": string, "kubeconfig_path": string, "kubeconfig_context": string}`.
+The address must be the DNS name or IP address of the istio-ingressgateway.
+The given context in the kubeconfig file must have credentials to connect to the cluster; we list the Kubernetes `Services` which are running.
 
 For example:
 ```json
 [
   {
     "name": "a",
-    "address": "a.com"
+    "address": "a.com",
+    "kubeconfig_path": "./kubeconfig-a",
+    "kubecondig_context": "default"
   },
   {
     "name": "b",
-    "address": "b.com"
+    "address": "b.com",
+    "kubeconfig_path": "./kubeconfig-b",
+    "kubecondig_context": "default"
   },
   {
     "name": "c",
-    "address": "c.com"
+    "address": "c.com",
+    "kubeconfig_path": "./kubeconfig-c",
+    "kubecondig_context": "default"
   }
 ]
 ```
 
-`service.json` is a JSON array of service objects where each service is:
+## CLI Mode
+Coddiwomple has a CLI mode which is designed to be called from scripts and gives more control over the input and generated output.
+
+```bash
+cw gen --cluster-file ./clusters.json --service-file ./services.json
+```
+
+Where `clusters.json` must is a JSON array of clusters, as above.
+
+In CLI mode, no connection is made to the clusters on your behalf, so Services must be explicitly listed as well.
+This allows you to list only the Services for which you'd like Istio multi-mesh config generated.
+
+Thus, `service.json` is a JSON array of service objects where each service is:
 ```json
 [
   {
     "name": string,
-    "dns_prefixes": string[],
+    "dns_prefixes": string[], // names by which the service can be addressed. Coddiwomple will emit configuration which will also make <prefix>.global availabe
     "ports": {
-      "name": string,
+      "name": string, // Name associated with the port
       "protocol": string, // MUST BE one of HTTP|HTTPS|GRPC|HTTP2|MONGO|TCP.
-      "service_port": uint32,
-      "backend_port": uint32,
-
+      "service_port": uint32, // This is the port clients call in to, i.e. the port to intercept in the mesh, and to open at the gateway
+      "backend_port": uint32, // The port exposed by the backend (k8s) Service.
     },
-    // each key should be the name of a cluster in the cluster-file.
+    // Each key should be the name of a cluster in the cluster-file.
     // Each value is the (fully qualified) name of the service in that cluster.
     "backends": {[key: string]: string},
-    "address": string,
+    "address": string, // [optional, rarely used] hard-coded IP address of the service for TCP services
   }
 ]
 ```
@@ -111,27 +137,3 @@ For exmaple:
     }
 ]
 ```
-
-## TODO
-
-- `mcc create-service-json --kubeconfig-path ./path/to/kube/config --kubeconfig-context cluster-name --out ./services.json`
-  - Command that connects to a kube cluster, creates GlobalService configs for all of them, merging them if they already exist in the output file.
-- `mcc create-cluster-json --name cluster-name --address cluster.adress.com --out ./clusters.json`
-  - Similar to above, but for clusters
-- Support IP addresses in cluster address field
-
-  
-# Development
-
-To build:
-```bash
-dep ensure
-make
-```
-
-to re-build easily
-```bash
-make clean && make
-```
-
-Of course, `go build github.com/tetratelabs/mcc/cmd/mcc` also works. 
