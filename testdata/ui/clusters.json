@@ -1,0 +1,26 @@
+[
+    {
+        "name": "default",
+        "address": "default.foo.com",
+        "kubeconfig_path": "~/.kube/config",
+        "kubeconfig_context": "default"
+    },
+    {
+        "name": "a",
+        "address": "a.com",
+        "kubeconfig_path": "~/.kube/config",
+        "kubeconfig_context": "a"
+    },
+    {
+        "name": "b",
+        "address": "b.com",
+        "kubeconfig_path": "~/.kube/config",
+        "kubeconfig_context": "b"
+    },
+    {
+        "name": "c",
+        "address": "c.com",
+        "kubeconfig_path": "~/.kube/config",
+        "kubeconfig_context": "c"
+    }
+]
