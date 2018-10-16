@@ -23,7 +23,7 @@ import (
 func Root() *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:   "cw",
-		Short: "Coddiwomple creates mantifests",
+		Short: "Coddiwomple creates manifests for cross-cluster routing",
 		Long:  `Coddiwomple, a multi-cloud cross-cluster configuration generator for Istio`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return errors.New("cannot use cw directly, use a subcommand")
@@ -32,7 +32,7 @@ func Root() *cobra.Command {
 
 	rootCmd.AddCommand(
 		uiCmd(),
-		configGenCmd(),
+		genCmd(),
 	)
 
 	return rootCmd
