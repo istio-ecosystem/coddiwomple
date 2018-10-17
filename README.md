@@ -12,9 +12,9 @@ Coddiwomple takes a list of the clusters and the services running in them, and g
 
 ## Installation
 ```bash
-$ go get -u github.com/istio-ecosystem/cw
-$ cd $GOPATH/github.com/istio-ecosystem/cw
-$ dep ensure
+$ go get -u github.com/istio-ecosystem/coddiwomple
+$ cd $GOPATH/src/github.com/istio-ecosystem/coddiwomple
+$ make deps
 $ make
 ```
 
