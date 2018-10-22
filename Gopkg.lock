@@ -18,6 +18,14 @@
   revision = "3a771d992973f24aa725d07868b467d1ddfceafb"
 
 [[projects]]
+  branch = "master"
+  digest = "1:61eda50b1c7785c6d876b3d31053a677313d5a85309668f29f7cb6d7ac0f0ab6"
+  name = "github.com/christopherhein/go-version"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "fee8dd1f7c24da23508e26347694be0acce5631b"
+
+[[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
@@ -690,16 +698,18 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/christopherhein/go-version",
     "github.com/ghodss/yaml",
     "github.com/hashicorp/go-multierror",
     "github.com/operator-framework/operator-sdk/pkg/sdk",
     "github.com/operator-framework/operator-sdk/pkg/sdk/metrics",
+    "github.com/operator-framework/operator-sdk/pkg/util/k8sutil",
     "github.com/pkg/errors",
-    "github.com/sirupsen/logrus",
     "github.com/spf13/cobra",
     "istio.io/api/networking/v1alpha3",
     "istio.io/istio/pilot/pkg/config/kube/crd",
     "istio.io/istio/pilot/pkg/model",
+    "istio.io/istio/pilot/pkg/serviceregistry/kube",
     "k8s.io/api/core/v1",
     "k8s.io/apimachinery/pkg/api/meta",
     "k8s.io/apimachinery/pkg/apis/meta/v1",

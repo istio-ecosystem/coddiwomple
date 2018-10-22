@@ -33,6 +33,7 @@ func Root() *cobra.Command {
 	rootCmd.AddCommand(
 		uiCmd(),
 		genCmd(),
+		versionCmd(),
 	)
 
 	return rootCmd
