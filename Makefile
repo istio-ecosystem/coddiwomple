@@ -14,8 +14,5 @@ cw:
 	go build -o cw ./cmd/cw
 	@chmod +x cw
 
-install:
-	go install ./cmd/cw
-
 clean:
 	@rm cw || true
