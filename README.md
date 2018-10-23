@@ -12,7 +12,17 @@ Coddiwomple takes a list of the clusters and the services running in them, and g
 
 ## Installation
 ```bash
-$ go get -u github.com/istio-ecosystem/coddiwomple
+$ go get github.com/istio-ecosystem/coddiwomple/cmd/cw
+```
+
+## Build
+```bash
+# Clone the repository
+$ mkdir -p $GOPATH/src/github.com/istio-ecosystem
+$ cd $GOPATH/src/github.com/istio-ecosystem
+$ git clone https://github.com/istio-ecosystem/coddiwomple.git
+
+# Build the source code
 $ cd $GOPATH/src/github.com/istio-ecosystem/coddiwomple
 $ make deps
 $ make
