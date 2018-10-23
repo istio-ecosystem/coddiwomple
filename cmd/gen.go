@@ -25,6 +25,23 @@ import (
 	"github.com/istio-ecosystem/coddiwomple/pkg/routing"
 )
 
+func genCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "gen",
+		Short: "Generate config files",
+		Long:  `Generate various Istio resource descriptions, and Coddiwomple config files`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return errors.New("cannot use gen directly, use a subcommand")
+		},
+	}
+
+	cmd.AddCommand(
+		configGenCmd(),
+	)
+
+	return cmd
+}
+
 func configGenCmd() *cobra.Command {
 
 	var (
@@ -36,9 +53,9 @@ func configGenCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:     "gen",
+		Use:     "config",
 		Short:   "Generates Istio config for each cluster for the target service.",
-		Example: "cw gen ",
+		Example: "cw gen config",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var err error
 
